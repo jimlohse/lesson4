@@ -51,9 +51,9 @@ jobs:
           name: clean up old front end
           command: |
             curl -H "token: 9ac11790-9e94-473a-bf85-009b10e3b619" --request GET https://api.memstash.io/values/ > last-id.txt
-            OldPipelineID = `cat last-id.txt`
+            export OldPipelineID=`cat last-id.txt`
             echo $OldPipeLineID
-            PreviousPipelineID = "production-distro"
+            export PreviousPipelineID="production-distro"
             echo $PreviousPipelineID
             aws s3 rm "s3://${OldPipelineID}" --recursive
             aws cloudformation delete-stack --stack-name "${PreviousPipelineID}"
@@ -62,13 +62,13 @@ workflows:
   my_workflow:
     # Runs the jobs in order
     jobs:
-      - create_and_deploy_front_end
-      - get_last_deployment_id:
-          requires: 
-            - create_and_deploy_front_end
-      - promote_to_production:
-          requires: 
-            - get_last_deployment_id
+      # - create_and_deploy_front_end
+      # - get_last_deployment_id:
+      #     requires: 
+      #       - create_and_deploy_front_end
+      # - promote_to_production:
+      #     requires: 
+      #       - get_last_deployment_id
       - clean_up_old_front_end:
-          requires: 
-            - promote_to_production
+          # requires: 
+          #   - promote_to_production
