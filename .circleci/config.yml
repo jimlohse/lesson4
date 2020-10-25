@@ -24,11 +24,12 @@ jobs:
           command: >
             aws cloudformation 
             list-exports --query "Exports[?Name==\`PipelineID\`].Value" 
-            --no-paginate --output text > ~/last-id.txt
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - last-id.txt
+            --no-paginate --output text > last-id.txt
+      - run: >
+          curl -H "Content-Type: text/plain" -H 
+          "token: 9ac11790-9e94-473a-bf85-009b10e3b619" 
+          --request PUT --data `cat last-id.txt` 
+          https://api.memstash.io/values/
 
   promote_to_production:
     docker:
@@ -46,11 +47,10 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
-      - attach_workspace:
-          at: ~/
       - run:
           name: clean up old front end
           command: |
+            curl -H "token: 9ac11790-9e94-473a-bf85-009b10e3b619" --request GET https://api.memstash.io/values/ > last-id.txt
             OldPipelineID = `cat last-id.txt`
             echo $OldPipeLineID
             PreviousPipelineID = "production-distro"
