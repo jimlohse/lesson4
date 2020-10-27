@@ -14,6 +14,9 @@ jobs:
             aws cloudformation deploy --template-file bucket.yml 
             --stack-name "jimstack-${CIRCLE_WORKFLOW_ID:0:7}" 
             --parameter-overrides NAME="jimstack-${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: copy new index.html to new S3 bucket
+          run: aws s3 cp index.html s3://jimstack-${CIRCLE_WORKFLOW_ID:0:7}
 
   get_last_deployment_id:
     docker:
