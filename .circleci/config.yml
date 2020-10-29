@@ -16,7 +16,7 @@ jobs:
             --parameter-overrides NAME="jimstack-${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: copy new index.html to new S3 bucket
-          command: aws s3 cp index.html s3://jimstack-${CIRCLE_WORKFLOW_ID:0:7}
+          command: aws s3 cp index.html s3://jimstack-${CIRCLE_WORKFLOW_ID:0:7} --acl public-read
       - run:
           name: temp command to print out new s3 bucket name
           command: echo "S3 bucket is jimstack-${CIRCLE_WORKFLOW_ID:0:7}"
@@ -69,12 +69,12 @@ workflows:
     # Runs the jobs in order
     jobs:
       - create_and_deploy_front_end
-      # - get_last_deployment_id:
-      #     requires: 
-      #       - create_and_deploy_front_end
-      # - promote_to_production:
-      #     requires: 
-      #       - get_last_deployment_id
-      # - clean_up_old_front_end:
-      #     requires: 
-      #       - promote_to_production
+      - get_last_deployment_id:
+          requires: 
+            - create_and_deploy_front_end
+      - promote_to_production:
+          requires: 
+            - get_last_deployment_id
+      - clean_up_old_front_end:
+          requires: 
+            - promote_to_production
